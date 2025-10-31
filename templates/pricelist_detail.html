@@ -1,0 +1,34 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Listino: {{ pl.name }}</h3>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary" href="{{ url_for('pricelist_export', lid=pl.id) }}">Export CSV</a>
+    <a class="btn btn-outline-dark" href="{{ url_for('pricelist_export_pdf', lid=pl.id) }}">Esporta PDF</a>
+  </div>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead><tr><th>SKU</th><th>Prodotto</th><th>Prezzo ({{ pl.currency }})</th><th></th></tr></thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td>{{ p.sku }}</td>
+          <td>{{ p.name }}</td>
+          <td style="max-width: 180px;">
+            <form action="{{ url_for('pricelist_set_price', lid=pl.id) }}" method="post" class="d-flex gap-2">
+              <input type="hidden" name="product_id" value="{{ p.id }}">
+              <input class="form-control" type="number" step="0.01" name="price" value="{{ (existing.get(p.id).price if existing.get(p.id) else '') }}">
+              <button class="btn btn-sm btn-outline-success">Salva</button>
+            </form>
+          </td>
+          <td class="text-end"></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

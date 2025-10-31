@@ -1,0 +1,60 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Report Scadenze</h3>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary" href="{{ url_for('report_expiring_csv', days=days, category=category, supplier=supplier) }}">Export CSV</a>
+    <a class="btn btn-outline-dark" href="{{ url_for('report_expiring_pdf', days=days, category=category, supplier=supplier) }}">Esporta PDF</a>
+  </div>
+</div>
+<form class="row g-2 mb-3">
+  <div class="col-md-2">
+    <label class="form-label">Entro (giorni)</label>
+    <input class="form-control" type="number" name="days" value="{{ days }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Categoria</label>
+    <select class="form-select" name="category">
+      <option value="">Tutte</option>
+      {% for c in categories %}
+      <option value="{{ c }}" {% if c==category %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Fornitore</label>
+    <select class="form-select" name="supplier">
+      <option value="">Tutti</option>
+      {% for s in suppliers %}
+      <option value="{{ s }}" {% if s==supplier %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">&nbsp;</label>
+    <button class="btn btn-secondary w-100" type="submit">Aggiorna</button>
+  </div>
+</form>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead><tr><th>Scadenza</th><th>Prodotto (SKU)</th><th>Lotto</th><th>Q.tà</th><th>Categoria</th><th>Fornitore</th></tr></thead>
+      <tbody>
+        {% for l in lots %}
+        <tr>
+          <td>{{ l.expiry_date.strftime('%d/%m/%Y') if l.expiry_date else '—' }}</td>
+          <td>{{ l.product.name }} ({{ l.product.sku }})</td>
+          <td>{{ l.lot_code }}</td>
+          <td>{{ l.qty }}</td>
+          <td>{{ l.product.category_ref.name if l.product.category_ref else '' }}</td>
+          <td>{{ l.product.supplier_ref.name if l.product.supplier_ref else '' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted">Nessuna scadenza nel periodo selezionato</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

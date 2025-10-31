@@ -1,0 +1,71 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<h3>Lotti • {{ p.name }} <small class="text-muted">({{ p.sku }})</small></h3>
+<div class="mb-3">
+  <a class="btn btn-secondary" href="{{ url_for('products') }}">← Torna ai prodotti</a>
+</div>
+<div class="row g-3">
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header">Aggiungi lotto</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('product_lot_new', pid=p.id) }}" class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Lotto</label>
+            <input class="form-control" type="text" name="lot_code" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Scadenza</label>
+            <input class="form-control" type="date" name="expiry_date" placeholder="YYYY-MM-DD">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Quantità</label>
+            <input class="form-control" type="number" name="qty" value="0">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Note</label>
+            <textarea class="form-control" name="notes" rows="2"></textarea>
+          </div>
+          <div class="col-12">
+            <button class="btn btn-success">Aggiungi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table table-striped align-middle mb-0">
+          <thead><tr><th>Lotto</th><th>Scadenza</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
+          <tbody>
+          {% for lot in p.lots|sort(attribute='expiry_date') %}
+            {% set soon = (lot.expiry_date and (lot.expiry_date - (now().date() if now else namespace().date())).days <= 30) %}
+            <tr>
+              <td>{{ lot.lot_code }}</td>
+              <td>
+                {% if lot.expiry_date %}
+                  {{ lot.expiry_date.strftime('%d/%m/%Y') }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>{{ lot.qty }}</td>
+              <td>{{ lot.notes or '' }}</td>
+              <td class="text-end">
+                <form action="{{ url_for('product_lot_delete', pid=p.id, lid=lot.id) }}" method="post" onsubmit="return confirm('Eliminare questo lotto?');">
+                  <button class="btn btn-sm btn-outline-danger">Elimina</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="text-center text-muted">Nessun lotto</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

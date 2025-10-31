@@ -1,0 +1,42 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Fornitori</h3>
+  <div class="d-flex gap-2">
+    <form class="d-flex" method="get">
+      <input class="form-control me-2" type="search" placeholder="Cerca per nome/email/telefono" name="q" value="{{ q }}">
+      <button class="btn btn-secondary">Cerca</button>
+    </form>
+    <a class="btn btn-success" href="{{ url_for('supplier_new') }}">+ Nuovo</a>
+  </div>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead><tr><th>Nome</th><th>Contatti</th><th>Indirizzo</th><th>Note</th><th></th></tr></thead>
+      <tbody>
+        {% for s in rows %}
+        <tr>
+          <td><strong>{{ s.name }}</strong><br><small class="text-muted">P.IVA {{ s.vat_number or '—' }} · CF {{ s.tax_code or '—' }}</small></td>
+          <td>
+            {% if s.email %}<div>{{ s.email }}</div>{% endif %}
+            {% if s.phone %}<div>{{ s.phone }}</div>{% endif %}
+          </td>
+          <td>{{ s.address or '' }}</td>
+          <td>{{ s.notes or '' }}</td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('supplier_edit', sid=s.id) }}">Modifica</a>
+            <form action="{{ url_for('supplier_delete', sid=s.id) }}" method="post" style="display:inline" onsubmit="return confirm('Eliminare questo fornitore?');">
+              <button class="btn btn-sm btn-outline-danger">Elimina</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted">Nessun fornitore</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

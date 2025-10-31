@@ -1,0 +1,75 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Prodotti</h3>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-dark" href="{{ url_for('categories') }}">Categorie</a>
+    <a class="btn btn-outline-dark" href="{{ url_for('suppliers') }}">Fornitori</a>
+    <a class="btn btn-success" href="{{ url_for('product_new') }}">+ Nuovo</a>
+    <a class="btn btn-outline-primary" href="{{ url_for('products_export') }}">Export CSV</a>
+  </div>
+</div>
+<form class="row g-2 mb-3">
+  <div class="col-md-6">
+    <input class="form-control" type="search" name="q" placeholder="Cerca per nome o SKU" value="{{ q }}">
+  </div>
+  <div class="col-md-4">
+    <select class="form-select" name="category">
+      <option value="">Tutte le categorie</option>
+      {% for c in categories %}
+      <option value="{{ c }}" {% if c==category %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-secondary w-100" type="submit">Filtra</button>
+  </div>
+</form>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>SKU</th><th>Nome</th><th>Categoria</th><th>Fornitore</th><th>Prezzo</th><th>Giacenza</th><th>Margine</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in items %}
+        {% set warn = (p.min_stock and p.stock_qty <= p.min_stock) %}
+        <tr {% if warn %}class="table-warning"{% endif %}>
+          <td>{{ p.sku }}</td>
+          <td><strong>{{ p.name }}</strong></td>
+          <td>{{ p.category_ref.name if p.category_ref else '' }}</td>
+          <td>{{ p.supplier_ref.name if p.supplier_ref else '' }}</td>
+          <td>€ {{ p.price|fmtmoney }}</td>
+          <td>{{ p.stock_qty }} {% if p.min_stock %}<small class="text-muted">/ min {{ p.min_stock }}</small>{% endif %}</td>
+          <td>
+            {% if p.cost and p.cost > 0 and p.price and p.price > 0 %}
+              {% set m = (p.price - p.cost) %}
+              {% set mp = (m / p.price * 100) %}
+              € {{ m|fmtmoney }} <small class="text-muted">({{ mp|round(1) }}%)</small>
+            {% else %}
+              <small class="text-muted">—</small>
+            {% endif %}
+          </td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('product_edit', pid=p.id) }}">Modifica</a>
+            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('product_lots', pid=p.id) }}">Lotti</a>
+            <form action="{{ url_for('product_delete', pid=p.id) }}" method="post" style="display:inline" onsubmit="return confirm('Eliminare questo prodotto?');">
+              <button class="btn btn-sm btn-outline-danger">Elimina</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer">
+    <form action="{{ url_for('products_import') }}" method="post" enctype="multipart/form-data" class="d-flex gap-2">
+      <input class="form-control" type="file" name="file" accept=".csv">
+      <button class="btn btn-outline-dark" type="submit">Import CSV</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

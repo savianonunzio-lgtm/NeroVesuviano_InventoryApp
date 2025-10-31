@@ -1,0 +1,42 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Prodotti</h5>
+        <p class="card-text display-6">{{ product_count }}</p>
+        <a class="btn btn-primary" href="{{ url_for('products') }}">Vai ai prodotti</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Listini</h5>
+        <p class="card-text display-6">{{ price_list_count }}</p>
+        <a class="btn btn-primary" href="{{ url_for('pricelists') }}">Vai ai listini</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Sotto scorta</h5>
+        <p class="card-text display-6">{{ low_stock }}</p>
+        <a class="btn btn-outline-secondary" href="{{ url_for('products', q='', category='') }}">Controlla</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Scadenze (30 gg)</h5>
+        <p class="card-text display-6">{{ expiring }}</p>
+        <a class="btn btn-outline-secondary" href="{{ url_for('products', q='', category='') }}">Dettagli</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

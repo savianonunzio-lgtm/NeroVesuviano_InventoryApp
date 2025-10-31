@@ -1,0 +1,32 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Categorie</h3>
+  <a class="btn btn-success" href="{{ url_for('category_new') }}">+ Nuova</a>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead><tr><th>Nome</th><th>Descrizione</th><th>Prodotti</th><th></th></tr></thead>
+      <tbody>
+        {% for c in rows %}
+        <tr>
+          <td><strong>{{ c.name }}</strong></td>
+          <td>{{ c.description or '' }}</td>
+          <td>{{ c.products|length }}</td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('category_edit', cid=c.id) }}">Modifica</a>
+            <form action="{{ url_for('category_delete', cid=c.id) }}" method="post" style="display:inline" onsubmit="return confirm('Eliminare questa categoria?');">
+              <button class="btn btn-sm btn-outline-danger">Elimina</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted">Nessuna categoria</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
